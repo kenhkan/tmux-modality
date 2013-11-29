@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python
 #----------------------------------------------------------------------------
 # tmux-modality - Vi-like modal key bindings for tmux
 #
@@ -24,8 +24,8 @@ import tempfile
 
 #----------------------------------------------------------------------------
 
-python = "/usr/bin/python2"
-tmux = "/usr/bin/tmux"
+python = "/usr/bin/python"
+tmux = "/usr/local/bin/tmux"
 
 command_mode_colors = {
     "pane-active-border-bg": "colour16",
@@ -140,62 +140,54 @@ def mode_command():
     # them here.
     if not pass_through:
         binder.bind( "!", [ "break-pane" ] )
-        binder.bind( "[", [ "copy-mode" ] )
         binder.bind( "{", [ "swap-pane", "-U" ] )
         binder.bind( "}", [ "swap-pane", "-D" ] )
         binder.bind( ":", [ "command-prompt" ] )
-        #binder.bind( ",", [ "rename-window" ] )
         binder.bind( "c", [ "new-window" ] )
         binder.bind( "o", [ "select-pane", "-t", ":.+" ] )
-        binder.bind( "Space", [ "next-layout" ] )
 
     # Convenience bindings:
-    binder.bind( "|", [ "split-window", "-h" ] )
-    binder.bind( "-", [ "split-window", "-v" ] )
-    #binder.bind( "<", [ "rename-session" ] )
-    binder.bind( "1", [ "select-pane", "-t", "1" ] )
-    binder.bind( "2", [ "select-pane", "-t", "2" ] )
-    binder.bind( "3", [ "select-pane", "-t", "3" ] )
-    binder.bind( "4", [ "select-pane", "-t", "4" ] )
-    binder.bind( "5", [ "select-pane", "-t", "5" ] )
-    binder.bind( "6", [ "select-pane", "-t", "6" ] )
-    binder.bind( "7", [ "select-pane", "-t", "7" ] )
-    binder.bind( "8", [ "select-pane", "-t", "8" ] )
-    binder.bind( "9", [ "select-pane", "-t", "9" ] )
-    binder.bind( "0", [ "select-pane", "-t", "10" ] )
+    binder.bind( "*", [ "split-window", "-h" ] )
+    binder.bind( "#", [ "split-window", "-v" ] )
+
+    binder.bind( "C", [ "copy-mode" ] )
+    binder.bind( "P", [ "paste-buffer" ] )
+
     binder.bind( "n", [ "select-window", "-n" ] )
     binder.bind( "p", [ "select-window", "-p" ] )
-    binder.bind( "t", [ "clock-mode" ] )
-    binder.bind( "M-1", [ "select-window", "-t", ":1" ] )
-    binder.bind( "M-2", [ "select-window", "-t", ":2" ] )
-    binder.bind( "M-3", [ "select-window", "-t", ":3" ] )
-    binder.bind( "M-4", [ "select-window", "-t", ":4" ] )
-    binder.bind( "M-5", [ "select-window", "-t", ":5" ] )
-    binder.bind( "M-6", [ "select-window", "-t", ":6" ] )
-    binder.bind( "M-7", [ "select-window", "-t", ":7" ] )
-    binder.bind( "M-8", [ "select-window", "-t", ":8" ] )
-    binder.bind( "M-9", [ "select-window", "-t", ":9" ] )
-    binder.bind( "M-0", [ "select-window", "-t", ":10" ] )
+
+    binder.bind( "0", [ "select-window", "-t", ":0" ] )
+    binder.bind( "1", [ "select-window", "-t", ":1" ] )
+    binder.bind( "2", [ "select-window", "-t", ":2" ] )
+    binder.bind( "3", [ "select-window", "-t", ":3" ] )
+    binder.bind( "4", [ "select-window", "-t", ":4" ] )
+    binder.bind( "5", [ "select-window", "-t", ":5" ] )
+    binder.bind( "6", [ "select-window", "-t", ":6" ] )
+    binder.bind( "7", [ "select-window", "-t", ":7" ] )
+    binder.bind( "8", [ "select-window", "-t", ":8" ] )
+    binder.bind( "9", [ "select-window", "-t", ":9" ] )
+
+    binder.bind( "-", [ "run-shell", "tmux switch -t work" ] )
+    binder.bind( "=", [ "run-shell", "tmux switch -t play" ] )
+
+    binder.bind( "C-Space", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
+
+    # Seamless navigation
+    binder.bind( "Left", [ "run-shell", "tmux select-pane -L" ] )
+    binder.bind( "Right", [ "run-shell", "tmux select-pane -R" ] )
+    binder.bind( "Up", [ "run-shell", "tmux select-pane -U" ] )
+    binder.bind( "Down", [ "run-shell", "tmux select-pane -D" ] )
 
     # Vim-like bindings:
-    binder.bind( "a", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
-    binder.bind( "h", [ "select-pane", "-L" ] )
     binder.bind( "H", [ "resize-pane", "-L", "1" ] )
-    binder.bind( "i", [ "run-shell", python + ' ' + modality + mc + ' insert -p command' ] )
-    binder.bind( "j", [ "select-pane", "-D" ] )
     binder.bind( "J", [ "resize-pane", "-D", "1" ] )
-    binder.bind( "k", [ "select-pane", "-U" ] )
     binder.bind( "K", [ "resize-pane", "-U", "1" ] )
-    binder.bind( "l", [ "select-pane", "-R" ] )
     binder.bind( "L", [ "resize-pane", "-R", "1" ] )
+
     binder.bind( "q", [ "detach-client" ] )
+    binder.bind( "r", [ "source-file", "~/.tmux.conf" ] )
     binder.bind( "x", [ "confirm-before", "-p", "kill-pane #P? (y/n)", "kill-pane" ] )
-    binder.bind( "Z", [ "confirm-before", "-p", "kill-window #W? (y/n)", "kill-window" ] )
-    binder.bind( "Down", [ "select-pane", "-D" ] )
-    binder.bind( "Left", [ "select-pane", "-L" ] )
-    binder.bind( "Right", [ "select-pane", "-R" ] )
-    binder.bind( "Up", [ "select-pane", "-U" ] )
-    #binder.bind( "C-6", [ "select-window", "-l" ] )
+    binder.bind( "X", [ "confirm-before", "-p", "kill-window #W? (y/n)", "kill-window" ] )
 
     if use_mode_colors:
         binder.set_colors( command_mode_colors )
@@ -305,7 +297,7 @@ def mode_insert():
     if not use_mode_colors:
         mc = ""
 
-    binder.bind( "C-\\", [
+    binder.bind( "C-Space", [
         "run-shell",
         python + ' ' + modality + pt + mc + ' -p insert command'
     ] )
